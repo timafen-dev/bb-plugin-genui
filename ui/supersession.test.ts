@@ -12,6 +12,19 @@ const OUTLINE: readonly OutlineItem[] = [
 ];
 
 describe("hasLaterUserMessage", () => {
+  it("does not count service messages from other threads or BB as an answer (timafen-dev fork)", () => {
+    const outline: OutlineItem[] = [
+      { id: "thr_a:user-seed:1", role: "user", preview: "Привет" },
+      { id: ASK, role: "assistant" },
+      { id: "thr_a:user-seed:41", role: "user", preview: "[bb message from thread:thr_x]\n\nОтчёт" },
+      { id: "thr_a:user-seed:42", role: "user", preview: "[bb system] @thread:thr_y completed" },
+      { id: LATEST, role: "assistant" },
+    ];
+    expect(hasLaterUserMessage(outline, ASK)).toBe(false);
+    expect(hasLaterUserMessage([...outline, { id: "thr_a:user-seed:50", role: "user", preview: "Да, делай" }], ASK)).toBe(true);
+    expect(hasLaterUserMessage([...outline, { id: "thr_a:user-seed:51", role: "user" }], ASK)).toBe(true);
+  });
+
   it("is true for a reply the user has answered since", () => {
     expect(hasLaterUserMessage(OUTLINE, ASK)).toBe(true);
   });

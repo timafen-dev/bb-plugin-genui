@@ -5,6 +5,20 @@
 export interface OutlineItem {
   readonly id: string;
   readonly role: "assistant" | "user";
+  /** Start of the message text, as BB's outline gives it. */
+  readonly preview?: string | null;
+}
+
+/**
+ * Service messages BB delivers into a thread as user rows: reports and
+ * questions from other threads ("[bb message from thread:…]") and BB's own
+ * notices ("[bb system] …"). They are not the owner answering, so they must
+ * not close a reply's choices (timafen-dev fork).
+ */
+const SERVICE_MESSAGE = /^\s*\[bb (message from thread:|system\])/;
+
+export function isServiceMessage(item: OutlineItem): boolean {
+  return item.role === "user" && typeof item.preview === "string" && SERVICE_MESSAGE.test(item.preview);
 }
 
 /** A user row's event sequence, from its `<thread>:user-seed:<seq>` id; null for any other id. */
@@ -29,6 +43,7 @@ export function hasLaterUserMessage(items: readonly OutlineItem[] | null, anchor
   let highest = -1;
   for (const [index, item] of items.entries()) {
     if (item.role !== "user") continue;
+    if (isServiceMessage(item)) continue;
     const seq = userSeq(item.id);
     if (seq !== null && seq < highest) continue;
     if (index > anchor) return true;

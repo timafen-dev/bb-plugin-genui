@@ -111,7 +111,7 @@ class ThreadOutlines {
       .conversationOutline({ threadId, signal: entry.abort.signal })
       .then(
         ({ items }) => {
-          entry.items = items.map(({ id, role }) => ({ id, role }));
+          entry.items = items.map(({ id, role, preview }) => ({ id, role, preview: typeof preview === "string" ? preview.slice(0, 64) : null }));
           for (const listener of entry.listeners) listener();
         },
         // A failed read keeps the last outline; the next change reads again. Without one,

@@ -1,3 +1,5 @@
+> **timafen-dev fork.** One change from ComicBit/bb-plugin-genui: service messages BB puts into a thread as user rows (`[bb message from thread:…]`, `[bb system] …`) no longer close a reply's buttons and choices; only a real message from the owner does (`ui/supersession.ts`). Version suffix `-timafen.N`.
+
 <div align="center">
 
 # Generative UI for BB
